@@ -1,0 +1,415 @@
+---
+title: "The Effects of the COVID-19 Pandemic on Emory University Students of Different Economic Backgrounds"
+author: "Simran Mallik"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  rmdformats::readthedown:
+    code_folding: show
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# I am using the tidyverse package for my analysis 
+library(tidyverse)
+library(plotly)
+library(kableExtra)
+```
+
+By Simran Mallik
+
+# Introduction and Motivation 
+
+"We have therefore made the assessment that COVID-19 can be characterized as a pandemic," announced the Director-General of the World Health organization on March 11th, 2020 ("WHO Director-General's Opening Remarks at the Media Briefing on COVID-19 - 11 March 2020."). 
+Around the same time the announcement was made, businesses, stores, and colleges across the nation started shutting down in response to the catastrophic pandemic (Baker, Mike, et al) (Harrington, John, and Samuel Stebbins), and America was beginning its long journey in lockdown through one the greatest economic recessions in modern history (Global Economic Prospects, June 2020, 2020). 
+
+The pandemic has exacerbated the widening chasm of income inequality in America. It has magnified the luxuries that people of higher income can afford and the great disadvantages that people of lower income face during a time of crisis. While most college students have similar shared experiences of the effects of the pandemic, such as having to study online or having to move back into their parents house, not all students have been affected equally. Students who come from families earning less than 75,000 dollars are twice as likely to cancel plans to take courses for the semester compared to students from families earning over 100,000 dollars (The Latest Crisis: Low-Income Students Are Dropping out of College This Fall in Alarming Numbers, 2020). Additionally, according to a survey conducted on 1,500 students from large public universities in the U.S., fourty percent of students lost either a job offer, a job, or an internship due to the pandemic (Smith, 2020). 
+
+![alt](/Users/simranmallik/Desktop/Econ 220L/effectsOfPandemic.png)
+
+
+(Kim Parker, Rachel Minkin and Jesse Bennett)
+
+Not only have education and career plans for students from different economic backgrounds been disrupted, but the health and wellness of those from different economic backgrounds have been affected disproportionately as well. The exposure level to Covid-19 for individuals can vary based on what income level an individual is from. According to an analysis conducted by Gallup, 71% of people who earn more than 180,000 dollars have the ability to work remotely during the pandemic, compared to 41% of people earning less than 24,000 dollars (Khazan, 2020). The New York Times has also found that those who are "well-off" can stay home and avoid exposure to COVID-19 during the week compared to those who are low income (Khazan, 2020). 
+
+My curiosity and research into how the pandemic has emphasized inequality amongst the classes has led me to explore the following hypotheses: 
+
+# Hypotheses: {.tabset}
+
+## Hypothesis 1
+1. A greater proportion Emory students from the Under \$50,000 Income Level spent the majority of their time since March completing an in person job/internship than the proportions of Emory students in the \$50,001-\$100,000 Income Level and the \$100,000+ Income Level who did the same.
+
+## Hypothesis 2
+2. A smaller proportion Emory students from the Under \$50,000 Income Level spent the majority of their time since March taking online classes or holding an online job/internship than the proportions of Emory students in the \$50,001-\$100,000 Income Level and the \$100,000+ Income Level who did the same.
+
+
+## Hypothesis 3
+3. A greater proportion Emory students from the Under \$50,000 Income Level have a family member who lost their job because of the pandemic compared to the proportion of Emory students in the \$50,001-\$100,000 Income Level and the \$100,000+ Income Level who experienced the same. 
+
+## Hypothesis 4
+4. Emory students from the Under \$50,000 Income Level will be more frustrated with the government response to the pandemic compared to the students from the \$50,001-\$100,000 Income Level and the \$100,000+ Income Level.
+
+## Hypothesis 5
+5. There is no difference amongst the proportions of Emory students from all three Income Levels who are afraid of falling ill from COVID-19. 
+
+## Hypothesis 6
+6. Emory students from the Under \$50,000 Income Level will be less strict in social distancing than Emory students from the \$50,001-\$100,000 Income Level and the \$100,000+ Income Level. 
+
+## Hypothesis 7
+7. Emory students from the Under \$50,000 Income Level will spend fewer hours per week on average on school work besides Zoom classes compared to Emory students from the \$50,001-\$100,000 Income Level and the \$100,000+ Income Level. 
+
+## Hypothesis 8
+8. There is no difference in the degree to which COVID-19 has impacted student's lives amongst the three Income Levels.
+
+# The Data Set
+I am using the dataset from Dr. Paloma Lopez de mesa Moyano's Econ 220 lab class for Section 3. I am referring to questions 22, 23, 26, 29,30, 41, and 48.
+
+
+# Grouping Emory Students Into Income Levels
+I am cleaning my data by grouping the Emory students in the dataset into three income levels. The lowest income level is comprised of those who come from families making under \$50,000 dollars, the middle income level is comprised of those making \$50,001 - \$100,000 dollars, and the highest income level is comprised of those making over \$100,000 dollars. 
+
+According to US News & World Report, a three-person family earning between \$30,000-\$50,000 is considered lower-middle class, whereas a three-person family earning \$50,000-\$100,000 is considered middle class (Snider, Susannah). A three-person family earning \$100,000+ falls into upper-middle class or rich (Snider, Susannah). Though there isn't data on how many people comprise each Emory student's family, I used these statistics as a best-estimate for the income levels I made for the Emory students. I divided the students into three income levels: the Under \$50,000 Income Level, the \$50,001 - \$100,000 Income Level, and the \$100,000+ Income Level. I decided to keep the proportions of the Emory students in the three income levels as is even though they are not equal because I wanted to have more data rather than omitting a number of students in the higher income levels and have less data to work with which could lead to potentially more inaccurate results. 
+```{r, results = 'hide', message = FALSE, warning = FALSE}
+
+load("/Users/simranmallik/Desktop/Econ 220L/Econ220DataF20_ano.Rdata")
+classData <- Econ220DataF20_ano %>% data.frame()
+
+
+# Creating levels for lowest, mid, and highest income level of Emory students based on the available dataset
+
+classData$IncomeLevel <- factor(classData$Income, order = TRUE, levels = c("Under $50,000", "$50,001 - $100,000", "$100,000+"))
+classData$IncomeLevel[classData$Income == "Under 50,000"] <- "Under $50,000"
+classData$IncomeLevel[classData$Income == "$50,001 - $ 100,000"] <- "$50,001 - $100,000"
+classData$IncomeLevel[classData$Income == "$100,001 - $ 200,000" | classData$Income == "$ 200,001 - $ 400,000" | classData$Income == "$400,001 - $600,000"| classData$Income == "$600,000+"] <- "$100,000+"
+
+classData$socialDistancing <- classData$q30
+classData$lifeImpact <- classData$q22
+classData$sentiment <- classData$q23
+
+```
+
+# Distribution Of Emory Students in the Three Income Levels
+
+```{r,message = FALSE, warning = FALSE}
+prop.table(table(classData$IncomeLevel)) %>%
+  kable(digits = 3, col.names = c("Income Level", "Proportion")) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F)
+
+# graph to show how much of our sample is comprised of students in each income level
+
+ggplotly(classData %>%
+  group_by(IncomeLevel) %>%
+  summarise(proportion = sum(n()) / nrow(classData)) %>%
+  ggplot(aes(IncomeLevel, proportion, fill = IncomeLevel)) + geom_col() + scale_fill_manual(values = c("blue3", "mediumvioletred", "tan2")) + labs(title = "Proportion of Emory Students by Income Level", y = "Proportion of Emory Students", x = "Income Level") + theme_test() + theme(plot.title = element_text(hjust = 0.1)))
+
+```
+
+# Data Visualization and Interpretation 
+
+## Who engaged in In-Person Activities?
+Which Income Level is comprised of the greatest proportion of Emory students who held an in-person job or internship since March?
+
+I included values 1-3 from the activity scale, where 1 = online job/internship, 2 = in person job/internship, and 3 = online classes.
+```{r, message = FALSE, warning = FALSE}
+
+# looking at the density plot for those who answered 1, 2, or 3 to question 26 (activities during the pandemic) for each Income Level group 
+activitiesData <- classData %>%
+  filter(q26 == 1 | q26 == 2 | q26 == 3)
+
+ggplotly(ggplot(activitiesData, aes(q26, fill = IncomeLevel)) + geom_histogram(aes(y = ..density..)) + geom_density(aes(col = IncomeLevel)) + facet_wrap(~IncomeLevel) + theme_test() + scale_fill_manual(values = c("blue3", "mediumvioletred", "tan2")) + labs(title = "Density Plot of Activities During Pandemic ", y = "Density", x = "Income Level") +theme(plot.title = element_text(hjust = 0.1)))
+
+# adding variable to see whether each individual held an in-person job or internship, or not
+classData <- classData %>%
+  mutate(InPersonJobIntern = q26 == 2) # creating a logical (boolean) variable
+
+
+InPersonData <- classData%>%
+  select(IncomeLevel, InPersonJobIntern) %>%
+  group_by(IncomeLevel) %>%
+  summarise_all(list(proportion = mean))
+# (this method works because each value of true gets assigned value of 1, each value of false gets assigned value of 0, and the mean is calculated (which is the proportion in this case since there are only values of 1 and 0))
+
+# graph showing proportion of students with in-person job/internship by income level
+ggplotly(ggplot(InPersonData, aes(IncomeLevel, proportion)) +
+  geom_col(aes(fill= IncomeLevel)) + labs(title = "Proportion of Students With In-Person Job/Internship by Income Level", y = "Proportion With In-Person Job/Internship", x = "Income Level") +theme(plot.title = element_text(size = 11, hjust = 0)) + scale_fill_manual(values = c("blue3", "mediumvioletred", "tan2")))
+
+```
+
+
+The Under \$50,000 Income Level has the highest percentage of Emory students (13.33%) that held an in-person job or internship during the pandemic. The \$100,000+ Income Level has the next highest percentage (7.92%), followed by the smallest percentage of Emory students (0.00%) that held an in person job or internship during the pandemic, comprised of students in the \$50,001-\$100,000 Income Level. Based on the graph alone, there does not seem to be a clear trend in the data. 
+
+## Who Engaged in Online Activities?
+Which Income Level is comprised of the greatest proportion of Emory students who took online classes or held an online job or internship during the pandemic? 
+I included values 1-3 from the activity scale, where 1 = online job/internship, 2 = in person job/internship, and 3 = online classes
+```{r, message = FALSE, warning = FALSE}
+
+# looking at the density plot for those who answered 1, 2, or 3 to question 26 (activities during the pandemic) for each Income Level group 
+activitiesData <- classData %>%
+  filter(q26 == 1 | q26 == 2 | q26 == 3)
+
+ggplotly(ggplot(activitiesData, aes(q26, fill = IncomeLevel)) + geom_histogram(aes(y = ..density..)) + geom_density(aes(col = IncomeLevel)) + facet_wrap(~IncomeLevel) + theme_test() + scale_fill_manual(values = c("blue3", "mediumvioletred", "tan2")) + labs(title = "Density Plot of Activities During Pandemic ", y = "Density", x = "Income Level") +theme(plot.title = element_text(hjust = 0.1)))
+
+# adding variable to see whether each individual held an in-person job or internship, or not
+classData <- classData %>%
+  mutate(OnlineClassJobIntern = (q26 == 1 | q26 == 3))
+
+# finding the mean number of Emory students who held an in-person job or internship FOR EACH INCOME LEVEL
+OnlineClassData <- classData %>%
+    select(IncomeLevel, OnlineClassJobIntern) %>%
+    group_by(IncomeLevel) %>%
+    summarise_all(list(proportion = mean))
+
+# graph showing proportion of students with online class/job/internship by income level
+ggplotly(ggplot(OnlineClassData, mapping=aes(IncomeLevel, proportion)) +
+  geom_col(aes(fill= IncomeLevel)) + scale_fill_manual(values = c("blue3", "mediumvioletred", "tan2")) + labs(title = "Proportion of Students With Online Class/Job/Internship by Income Level", y = "Proportion With Online Class/Job/Internship", x = "Income Level") + theme(plot.title = element_text(hjust = 0.9)) + theme_test())
+
+```
+
+
+68.19% of Emory students in the \$50,001-\$100,000 Income Level held an online class or online job or internship throughout the pandemic, followed by 58.42% of Emory students in the \$100,00+ level, followed by 26.67% of Emory students in the Under \$50,000 level . From the bar graph alone, there seems to be no identifiable trend in the data.
+
+
+## Who Had a Family Member Lose Their Job Because of the Pandemic?
+Which Income Level has the highest proportion of Emory students that have a family member who lost a job due to the COVID-19 pandemic? 
+```{r, message = FALSE, warning = FALSE}
+# adding variable to see whether each individual has a family member who lost their job due to the pandemic
+classData <- classData %>%
+  mutate(memberlostJob = (q48 == "Yes"))
+
+# finding the mean number of Emory students who lost a family member for each income level
+classData %>%
+    select(IncomeLevel, memberlostJob) %>%
+    group_by(IncomeLevel) %>%
+    summarise_all(list(mean = mean)) %>%
+  kable(col.names = c("Income Level", "Proportion Whose Family Member Lost Job Due to Pandemic"), digits = 3) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F)
+  
+
+
+lostFamilyMemberData <- classData %>%
+    select(IncomeLevel, memberlostJob) %>%
+    group_by(IncomeLevel) %>%
+    summarise_all(list(mean = mean))
+
+
+# graph showing proportion of students whose family member lost job due to pandemic by income level
+ggplotly(ggplot(lostFamilyMemberData, mapping=aes(IncomeLevel, mean)) +
+  geom_col(aes(fill= IncomeLevel)) + scale_fill_manual(values = c("blue3", "mediumvioletred", "tan2")) + labs(title = "Proportion of Students Whose Family Member Lost Job Due to Pandemic by Income Level", y = "Proportion Whose Family Member Lost Job", x = "Income Level") + theme(plot.title = element_text(size = 10)))
+
+```
+
+Based on the bar graph, the Under \$50,000 Income Level had the greatest percentage (73.33%) of Emory students who lost a family member to Covid-19, followed by the \$50,001-\$100,000 Income Level with a percentage of 22.73%, followed by the \$100,000+ Income Level with a percentage of 13.86%. 
+It is possible that there may be a negative association between income level and a family member losing a job due to the pandemic.
+
+
+## Sentiment Towards the Government COVID-19 Pandemic Response
+Is there is a difference amongst the medians of the responses to the sentiment scale of Emory students from all three income levels? 
+Emory students were asked to rate their sentiment towards the government response to the pandemic on a sentiment scale of 1-5, from 1 being extremely frustrated to 5 being extremely satisfied. 
+```{r, message = FALSE, warning = FALSE}
+
+
+classData$sentiment[classData$sentiment == 7] <- NA
+
+
+classData %>%
+  drop_na() %>%
+  group_by(IncomeLevel) %>%
+  summarise(mean(sentiment)) %>%
+  kable(col.names = c("Income Level", "Mean Sentiment Level Towards Government Pandemic Response"), digits = 3) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F)
+
+# creating a density plot to show the distribution of sentiment scale values by income level 
+ggplotly(ggplot(classData, aes(sentiment, fill = IncomeLevel)) + geom_histogram(aes(y = ..density..)) + geom_density(aes(col = IncomeLevel)) + facet_wrap(~IncomeLevel) + scale_fill_manual(values = c("blue3", "mediumvioletred", "tan2")) + labs(title = "Density Plot of Sentiment Towards Government Pandemic Response by Income Level", x = "Sentiment Level")+theme(plot.title = element_text(size = 10)))
+
+# graph showing sentiment towards government COVID-19 pandemic response by income level
+ggplotly(ggplot(classData, aes(IncomeLevel, sentiment)) + geom_boxplot(aes(fill = IncomeLevel)) + scale_fill_manual(values = c("blue3", "mediumvioletred", "tan2")) + labs(title = "Sentiment Towards Government COVID-19 Pandemic Response by Income Level", y = "Sentiment Level", x = "Income Level") +theme(plot.title = element_text(hjust = 1, size = 10)))
+
+```
+
+Based on the boxplot, there doesn't seem to be an identifiable trend in the data. The Under \$50,000 Income Level group and the \$100,000 Income Level group have a median sentiment score of  2, but the \$50,001 - \$100,000 Income Level group has a median sentiment score of 1. There are outliers within the boxplot representing the \$50,001 - \$100,000 Income Level group and the \$100,000 Income Level group indicating a sentiment score of 4 and 5, but the distribution of sentiment scores amongst the three income levels appears similar.  
+
+
+
+## Fear of Falling Ill From Covid and Social Distancing Strictness  
+Is there a relationship between the fear of falling ill from COVID-19 and strictness in social distancing, controlling on Income Level? 
+(Note: A higher social distancing strictness value indicates a more strict approach to social distancing)
+```{r, message = FALSE, warning = FALSE}
+
+# adding variable to see whether each individual is afraid of falling ill from COVID-19
+
+classData <- classData %>%
+  mutate(afraidOfCovid = (q29 == "Yes"))
+
+# finding the mean number / proportion (since values of q29 are now defined as 1 and 0) of Emory students who are afraid of falling ill from COVID-19 for each income level
+classData %>%
+    select(IncomeLevel, afraidOfCovid) %>%
+    group_by(IncomeLevel) %>%
+    summarise_all(list(mean = mean)) %>%
+  kable(col.names = c("Income Level", "Proportion Afraid of Falling Ill From COVID-19"), digits = 3) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F)
+  
+
+# creating a density plot to show the distribution of social distancing strictness scale values by income level 
+ggplotly(ggplot(classData, aes(socialDistancing, fill = IncomeLevel)) + geom_histogram(aes(y = ..density..)) + geom_density(aes(col = IncomeLevel)) + facet_wrap(~IncomeLevel) + scale_fill_manual(values = c("blue3", "mediumvioletred", "tan2")) + labs(title = "Density Plot of Social Distancing Strictness", x = "Social Distancing Strictness Scale Values")+theme(plot.title = element_text(hjust = .5)))
+
+
+# column graph showing relationship between fear of falling ill from COVID-19 and social distancing strictness by income level
+ggplotly(classData %>%
+  group_by(IncomeLevel, afraidOfCovid) %>%
+  summarise(x = median(socialDistancing)) %>%
+  ggplot(aes(afraidOfCovid, x, fill = IncomeLevel)) + geom_col(position = "dodge") + facet_wrap(~IncomeLevel) + labs(title="Social Distancing Strictness vs Fear of Falling Ill from COVID-19", x = "Afraid Falling Ill from Covid-19", y = "Median Social Distancing Strictness Value")+ scale_fill_manual(values = c("blue3", "mediumvioletred", "tan2")) +theme(plot.title = element_text(hjust = .5)))
+
+# boxplot graph showing relationship between fear of falling ill from COVID-19 and social distancing strictness by income level
+ggplotly(ggplot(classData, aes(q29, socialDistancing, fill = IncomeLevel)) + geom_boxplot() + facet_wrap(~IncomeLevel) + labs(title="Social Distancing Strictness vs Fear of Falling Ill from COVID-19", x = "Afraid of Falling Ill from COVID-19", y = "Social Distancing Strictness Values")+ scale_fill_manual(values = c("blue3", "mediumvioletred", "tan2")) +theme(plot.title = element_text(hjust = .5)))
+
+
+```
+
+60.00% of Emory students in the Under \$50,000 Income Level are afraid of falling ill from COVID-19, compared to 63.64% of Emory students in the \$50,001-\$100,000 Income Level and 63.37% of Emory students in the \$100,000+ Income Level.  
+
+Based on the graphs, there may be no trend in the data or identifiable relationship between Income Level and Fear of Falling Ill from Covid-19. 
+
+For all income levels, the median social distancing strictness value of those who are afraid of falling ill from COVID-19 for all income levels is 4, but there is variety in the median social distancing strictness value of those who are not afraid of falling ill from COVID-19. 
+The median social distancing strictness value of those who are not afraid of falling ill from Covid-19 in the Under \$50,000 Income Level group is 4, compared to 2.50 for the \$50,001 - \$100,000 Income Level group, and compared to 3 for the \$100,000+ Income Level group. 
+
+
+## Average Number of Hours Spent on School Work Per Week (other than Zoom classes)
+Do Emory students from the Under \$50,000 Income Level spend less hours on school work (besides Zoom classes) per week on average compared to Emory students from the \$50,001-\$100,000 and \$100,000+ Income Level?
+```{r, message = FALSE, warning = FALSE}
+
+classData$hoursSchool <- classData$q41
+classData$hoursSchool[classData$hoursSchool == "6-May"] <- NA
+classData$hoursSchool[classData$hoursSchool == "3.88"] <- "4"
+classData$hoursSchool <- as.numeric(classData$hoursSchool)
+
+classData %>%
+  drop_na() %>%
+  group_by(IncomeLevel) %>%
+  summarise(mean(hoursSchool)) %>%
+  kable(col.names = c("Income Level", "Mean Number of Hours on School Work"), digits = 3) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F)
+
+# creating a density plot to show the distribution of average number of hours on school work (besides Zoom classes) by income level 
+ggplotly(ggplot(classData, aes(hoursSchool, fill = IncomeLevel)) + geom_histogram(aes(y = ..density..)) + geom_density(aes(col = IncomeLevel)) + facet_wrap(~IncomeLevel) + scale_fill_manual(values = c("blue3", "mediumvioletred", "tan2")) + labs(title = "Density Plot of Average Number of Hours On School Work Per Week", y = "Average Number of Hours On School Work Per Week", x = "Income Level")+theme(plot.title = element_text(hjust = 0.5)))
+
+# violin graph showing number of hours spent on school work per week by income level
+ggplotly(ggplot(data = classData, aes(x = IncomeLevel, y = hoursSchool, fill = IncomeLevel), na.rm = T) + geom_violin() + labs(title="Number of Hours School Work Per Week by Income Level ", x = "Income Level", y = "Number of Hours on School Work Per Week")+ scale_fill_manual(values = c("blue3", "mediumvioletred", "tan2")) + theme(plot.title = element_text(hjust = 0.5)))
+
+# boxplot graph showing number of hours spent on school work per week by income level
+ggplotly(ggplot(data = classData, aes(x = IncomeLevel, y = hoursSchool, fill = IncomeLevel), na.rm = T) + geom_boxplot() + labs(title="Number of Hours on School Work Per Week by Income Level ", x = "Income Level", y = "Number of Hours on School Work Per Week")+ scale_fill_manual(values = c("blue3", "mediumvioletred", "tan2")) +theme(plot.title = element_text(hjust = .5)))
+
+
+```
+From the boxplot, there seems to be no discernable trend in the data. The median number of hours spent on school work (besides Zoom classes) per week for Emory students in the Under \$50,000 Income Level and the \$50,001-\$100,000 Income Level is 20 hours, followed by the median number of average hours spent on school work (besides Zoom classes) per week for Emory students in the $100,000+ Income Level, which is 19 hours. 
+
+## Social Distancing Strictness in Relation to the Degree to Which COVID-19 Has Impacted One's Life
+Is there a relationship between social distancing strictness and the degree to which COVID-19 has impacted one's life, controlling on Income Level? 
+```{r, message = FALSE, warning = FALSE}
+# scatterplot graph showing relationship between social distancing strictness and degree to which COVID-19 has impacted life by income level
+
+ggplotly(ggplot(classData, aes(socialDistancing, lifeImpact, fill = IncomeLevel)) + scale_fill_manual(values = c("blue3", "mediumvioletred", "tan2")) + geom_point() + geom_smooth(aes(color = IncomeLevel), method = "lm") + labs(title="Degree to Which Life Is Impacted by COVID-19 vs Social Distancing Strictness", x = "Social Distancing Strictness", y = "Degree to Which Life Is Impacted by COVID-19") + theme(plot.title = element_text(size = 11)))
+
+```
+Based on the graph, there seems to be a positive correlation between social distancing strictness and degree to which one's life has been impacted by COVID-19 for all income levels. The strongest relationship is seen in the Under \$50,000 Income Level, followed by that of the \$50,001-\$100,000 Income Level, followed by that of the \$100,000+ Income Level. 
+
+# Hypothesis Testing {.tabset}
+
+## Hypothesis 1
+We fail to reject the null hypothesis. 
+Since the p value is greater than .05 for both t tests, the null hypothesis that there is no difference between the proportion of Emory students from the Under \$50,000 Income Level and the proportions of Emory students in the \$50,001-\$100,000 Income Level and the \$100,000+ Income Level who spent the majority of their time since March completing an in person job/internshipis is failed to be rejected.
+```{r, message = FALSE, warning = FALSE}
+t.test(InPersonJobIntern ~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$50,001 - $100,000" )))
+t.test(InPersonJobIntern ~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$100,000+")))
+
+```
+## Hypothesis 2
+We reject the null hypothesis.
+Since the p value is less than .05 for both t tests, the null hypothesis that there is no difference between the proportion of Emory students from the Under \$50,000 Income Level and the proportions of Emory students in the \$50,001-\$100,000 Income Level and the \$100,000+ Income Level who spent the majority of their time since March completing an online class/job/internship is rejected. There is a statistically significantly greater proportion of Emory students in the \$50,001-\$100,000 Income Level and the \$100,000+ Income Level who completed an online class/job/internship compared to the proportion of Emory students in the Under \$50,000 Income Level who did completed the same activities. 
+```{r, message = FALSE, warning = FALSE}
+t.test(OnlineClassJobIntern ~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$50,001 - $100,000")))
+t.test(OnlineClassJobIntern  ~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$100,000+")))
+```
+## Hypothesis 3
+We reject the null hypothesis.
+Since the p value is less than .05 for both t tests, the null hypothesis that there is no difference between the proportion of Emory students from the Under \$50,000 Income Level and that of Emory students in the \$50,001-\$100,000 Income Level and the \$100,000+ Level (respectively) who have a family member who lost their job due to the pandemic to is rejected. There is a statistically significantly greater proportion of Emory students in the Under \$50,000 Income Level who have a family member who lost their job due to the pandemic compared to the proportion of Emory students in the \$50,001-\$100,000 Income Level and the \$100,000+ Income Level who experienced the same. 
+```{r, message = FALSE, warning = FALSE}
+t.test(memberlostJob ~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$50,001 - $100,000")))
+t.test(memberlostJob ~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$100,000+")))
+```
+## Hypothesis 4
+We fail to reject the null hypothesis. 
+Since the p value is greater than .05 for both t tests, the null hypothesis that there is no difference in sentiment towards the government response to the pandemic between the Emory students from the Under \$50,000 Income Level and \$50,001-\$100,000 Income Level and the Emory students from the Under \$50,000 Income Level and the \$100,000+ Income Level is failed to be rejected. 
+
+```{r, message = FALSE, warning = FALSE}
+t.test(sentiment ~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$50,001 - $100,000")))
+t.test(sentiment ~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$100,000+")))
+```
+
+## Hypothesis 5
+We fail to reject the null hypothesis. 
+Since the p value is greater than .05 for all three t tests, the null hypothesis that there is no difference in fear of falling ill from COVID-19 amongst the response to the pandemic amongst the Emory students from all three Income Levels is failed to be rejected. 
+```{r, message = FALSE, warning = FALSE}
+t.test(afraidOfCovid ~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$50,001 - $100,000")))
+t.test(afraidOfCovid ~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$100,000+")))
+t.test(afraidOfCovid ~ IncomeLevel, data = subset(classData, (IncomeLevel == "$50,001 - $100,000" | IncomeLevel == "$100,000+")))
+```
+
+## Hypothesis 6
+We fail to reject the null hypothesis. 
+Since the p value is greater than .05 for all three t tests, the null hypothesis that there is no difference in the strictness of social distancing amongst the Emory students from all three Income Levels is failed to be rejected. 
+```{r, message = FALSE, warning = FALSE}
+t.test(socialDistancing ~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$50,001 - $100,000")))
+t.test(socialDistancing ~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$100,000+")))
+t.test(socialDistancing ~ IncomeLevel, data = subset(classData, (IncomeLevel == "$50,001 - $100,000" | IncomeLevel == "$100,000+")))
+```
+## Hypothesis 7
+We fail to reject the null hypothesis. 
+Since the p value is greater than .05 for both t tests, the null hypothesis that there is no difference in the average number of hours per week spent on school work besides Zoom classes between Emory students from the Under \$50,000 and \$50,001 - \$100,000 income level and between Emory students from the Under \$50,000 and \$100,000+ income level is failed to be rejected. 
+```{r, message = FALSE, warning = FALSE}
+t.test(hoursSchool~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$50,001 - $100,000")))
+t.test(hoursSchool ~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$100,000+")))
+
+```
+## Hypothesis 8
+We fail to reject the null hypothesis. 
+Since the p value is greater than .05 for all three t tests, the null hypothesis that there is no difference in the degree to which COVID-19 has impacted an individual's life amongst Emory students of the three income levels is failed to be rejected. 
+```{r, message = FALSE, warning = FALSE}
+t.test(lifeImpact ~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$50,001 - $100,000")))
+t.test(lifeImpact ~ IncomeLevel, data = subset(classData, (IncomeLevel == "Under $50,000" | IncomeLevel == "$100,000+")))
+t.test(lifeImpact ~ IncomeLevel, data = subset(classData, (IncomeLevel == "$50,001 - $100,000" | IncomeLevel == "$100,000+")))
+
+```
+
+# Conclusion and Insights: 
+
+In this project, I examined the impacts that the COVID-19 pandemic has had on Emory students from different income backgrounds. I investigated any potential differences in the proportions of Emory students from the different income level groups who held an in-person job or internship, who took an online class, job or internship, who had a family member who lost a job because of the pandemic, and who was afraid of falling ill from COVID-19. I also examined which income level group exhibited more frustration towards the government response to the pandemic, which group was less strict in social distancing, which group spent less time on school work, and which group experienced a certain degree of life impact due to COVID-19. 
+
+## Findings
+
+I found two statistically significant relationships in my analysis and an interesting visible trend in one of my visualizations. 
+
+After visualizing the data through a column graph and conducting a t test, I found that there is a statistically significantly greater proportion of Emory students in the Under \$50,000 Income Level who have a family member who lost their job due to the pandemic compared to the proportions of Emory students in the \$50,001-\$100,000 and \$100,000 Income Levels who experienced the same. I hypothesized that this would be the case but I was suprised at the small magnitude of the p-values (0.002059 and 0.0001705). This phenomenon could be caused from a variety of factors. It may be possible that a greater percentage of individuals from a lower income background hold essential jobs or jobs that require constant interaction with customers in person (for example, retail). Because of the fact that many businesses lost many customers who woudld shop in person, the need for workers who constantly interacted with people in-person was greatly reduced, which could have led to many layoffs. This is a potential explanation for the phenomenon observed. 
+
+I found that there is a statistically significantly greater proportion of Emory students in the \$50,001-\$100,000 Income Level and the \$100,000+ Income Level who completed an online class/job/internship compared to the proportion of Emory students in the Under \$50,000 Income Level who did completed the same activities. I hypothesized that this would be the outcome because of multiple factors, one potential reason being that students from a lower income level may have had to devote their time to other duties or may not have had the luxury of being paying for online classes or may not have had the luxury to devote time to online jobs or internships. These are some potential reasons to explain the relationship observed.  
+
+I was intrigued at the positive relationship observed in the visualization where I plotted the degree to which one's life has been impacted by COVID-19 against the social distancing strictness level. For all income levels, there was a positive relationship between these two factors. Based on the graph, someone who takes social distancing more seriously is more likely to say that there life has been impacted to a greater degree because of COVID-19 than someone who takes social distancing less seriously. A potential reason for this could be that people who take social distancing more seriously may feel more isolated and feel like their life has changed to a greater degree because of COVID-19 compared to those who dont take social distancing as seriously. 
+
+## Improvements and Limitations
+For the survey: I think that the question asking "How much has your life been impacted by COVID-19" could mean many things, and could result in innacurate data. I think it may be better to specify what it means by how one's life has been impacted. For example, the word "life" could be replaced with "social life", "mental health", "physical health", or some other core life aspect. Since students may have different life aspects that hold a different weight of importance in their life, it may be better to phrase the question in a way to ensure clarity of answers and a more accurate interpretation of the data. 
+
+Regarding the data: There were 15 people in the Under \$50,000 Income Level, 22 people in the \$50,001 - \$100,000 Income Level, and 101 people in the Over \$100,000 Income Level, meaning that the distribution of students in the different income levels was not normal. It is very likely that my statistical results were skewed because of this not normal distribution. I decided to keep the sample size as is because I didn't want to sacrifice a larger sample size (which could lead to more accurate results) in the \$50,001 - \$100,000 Income Level and \$100,000 Income Level for a smaller sample size just to have the sample sizes across the income levels be the same. 
+
+
+# Works Cited
+
+1. Smith, E. (2020, September 10). Class Notes: The gender poverty gap, COVID-19’s impact on college students, and more. Brookings. https://www.brookings.edu/blog/up-front/2020/09/10/class-notes-the-gender-poverty-gap-covid-19s-impact-on-college-students-and-more/
+2. The latest crisis: Low-income students are dropping out of college this fall in alarming numbers. (2020, September 16). The Washington Post. https://www.washingtonpost.com/gdpr-consent/?next_url=https%3a%2f%2fwww.washingtonpost.com%2fbusiness%2f2020%2f09%2f16%2fcollege-enrollment-down%2f
+3. Khazan, O. (2020, April 28). Coronavirus Class Conflict Is Coming. The Atlantic. https://www.theatlantic.com/health/archive/2020/04/coronavirus-class-war-just-beginning/609919/
+4. Global Economic Prospects, June 2020. (2020, June 8). World Bank. https://www.worldbank.org/en/news/press-release/2020/06/08/covid-19-to-plunge-global-economy-into-worst-recession-since-world-war-ii
+5. Snider, Susannah. “Where Do I Fall in the American Economic Class System?” U.S. News &amp; World Report, U.S. News &amp; World Report, 29 Oct. 2019, money.usnews.com/money/personal-finance/family-finance/articles/where-do-i-fall-in-the-american-economic-class-system. 
+6. “WHO Director-General's Opening Remarks at the Media Briefing on COVID-19 - 11 March 2020.” World Health Organization, World Health Organization, 11 Mar. 2020, www.who.int/director-general/speeches/detail/who-director-general-s-opening-remarks-at-the-media-briefing-on-covid-19---11-march-2020. 
+7. Baker, Mike, et al. “First U.S. Colleges Close Classrooms as Virus Spreads. More Could Follow.” The New York Times, The New York Times, 6 Mar. 2020, www.nytimes.com/2020/03/06/us/coronavirus-college-campus-closings.html. 
+8. Harrington, John, and Samuel Stebbins. “30 Of America's Iconic Businesses That Closed Due to Coronavirus.” USA Today, Gannett Satellite Information Network, 10 Apr. 2020, www.usatoday.com/story/money/2020/04/10/businesses-closed-coronavirus/111526546/. 
+9. Kim Parker, Rachel Minkin and Jesse Bennett. “Economic Fallout From COVID-19 Continues To Hit Lower-Income Americans the Hardest.” Pew Research Center's Social &amp; Demographic Trends Project, 30 Oct. 2020, www.pewsocialtrends.org/2020/09/24/economic-fallout-from-covid-19-continues-to-hit-lower-income-americans-the-hardest/. 
+
+
